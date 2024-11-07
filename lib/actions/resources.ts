@@ -5,42 +5,72 @@ import { generateEmbeddings } from "../ai/embedding";
 import { embeddings as embeddingsTable } from "../db/schema/embeddings";
 
 export const createResource = async (input: any) => {
-  try {
-    // Validar y parsear el input usando el esquema
-    const parsedInput = insertResourceSchema.parse(input);
-    const { transcription, title, image, url } = parsedInput;
+	try {
+		// Validar y parsear el input usando el esquema
+		const parsedInput = insertResourceSchema.parse(input);
+		const {
+			idProductFeed,
+			sku,
+			brand,
+			title,
+			description,
+			mpn,
+			size,
+			imageLink,
+			additionalImageLink,
+			link,
+			condition,
+			availability,
+			price,
+			salePrice,
+			productType,
+			store,
+			customLabel,
+			categoryWeb,
+		} = parsedInput;
 
-    // Convertir la transcripción a cadena JSON para la inserción
-    const transcriptionJSON = transcription ? JSON.stringify(transcription) : "[]";
+		// Insertar el recurso en la tabla 'resources'
+		const [resource] = await db
+			.insert(resources)
+			.values({
+				idProductFeed,
+				sku,
+				brand,
+				title,
+				description,
+				mpn,
+				size,
+				imageLink,
+				additionalImageLink,
+				link,
+				condition,
+				availability,
+				price,
+				salePrice,
+				productType,
+				store,
+				customLabel,
+				categoryWeb,
+			})
+			.returning();
 
-    // Insertar el recurso en la tabla 'resources'
-    const [resource] = await db
-      .insert(resources)
-      .values({
-        transcription: transcriptionJSON,
-        title,
-        image,
-        url,
-      })
-      .returning();
+		// Generar embeddings a partir de la descripción del producto
+		const embeddings = await generateEmbeddings(description, sku, brand);
 
-    // Generar embeddings a partir de la transcripción si existe
-    const transcriptionArray = transcription ?? [];
+		// Insertar los embeddings en la tabla 'embeddings'
+		await db.insert(embeddingsTable).values(
+			embeddings.map((embedding: any) => ({
+				resourceId: resource.id,
+				content: embedding.content,
+				embedding: embedding.embedding,
+				sku,
+				brand,
+			}))
+		);
 
-    const embeddings = await generateEmbeddings(transcriptionArray);
-    await db.insert(embeddingsTable).values(
-      embeddings.map((embedding: any) => ({
-        resourceId: resource.id,
-        content: embedding.content,
-        embedding: embedding.embedding,
-        start: embedding.start,
-        duration: embedding.duration,
-      }))
-    );
-
-    return "Resource successfully created and embedded.";
-  } catch (error) {
-    // Devolver un mensaje de error claro
-    return error instanceof Error ? error.message : "Error, please try again.";
-  }
+		return "Resource successfully created and embedded.";
+	} catch (error) {
+		// Devolver un mensaje de error claro
+		return error instanceof Error ? error.message : "Error, please try again.";
+	}
 };
