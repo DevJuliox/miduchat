@@ -6,7 +6,7 @@ import { LoadingIcon } from "@/components/icons";
 const Loading = React.memo(({ tool }: { tool?: string }) => {
   const toolName =
     tool === "getInformation"
-      ? "Getting information"
+      ? "Buscando información"
       : tool === "addResource"
       ? "Adding information"
       : "Thinking";

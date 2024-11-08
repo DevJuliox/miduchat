@@ -4,9 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
 // Memorizar el componente para evitar renderizados innecesarios
-const AssistantMessage = React.memo(({ message }: { message: Message | undefined }) => {
-  if (!message || !message.content) return null;
-  console.log("🚀 ~ AssistantMessage ~ message:", message)
+const TextMarkdown = React.memo(({ message }: { message: string | undefined }) => {
+  if (!message) return null;
+  console.log("🚀 ~ TextMarkdown ~ message:", message)
 
   // Plantilla personalizada para los videos
   const components:any = {
@@ -48,7 +48,7 @@ const AssistantMessage = React.memo(({ message }: { message: Message | undefined
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={message.id}
+        key={message}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -56,14 +56,12 @@ const AssistantMessage = React.memo(({ message }: { message: Message | undefined
         id="markdown"
       >
         <ReactMarkdown components={components} className="overflow-y-scroll no-scrollbar-gutter ">
-          {message.content}
+          {message}
         </ReactMarkdown>
       </motion.div>
     </AnimatePresence>
   );
-}, (prevProps, nextProps) => {
-  return prevProps.message?.content === nextProps.message?.content;
 });
 
-AssistantMessage.displayName = "AssistantMessage";
-export default AssistantMessage;
+TextMarkdown.displayName = "TextMarkdown";
+export default TextMarkdown;

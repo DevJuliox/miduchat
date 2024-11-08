@@ -25,7 +25,7 @@ const embeddingModel = openai.embedding("text-embedding-ada-002");
 
 // Función para leer el archivo de productos motos.json
 export const readProductFile = () => {
-	const filePath = path.join(transcriptionsFolder, "motos.json");
+	const filePath = path.join(transcriptionsFolder, "motos2.json");
 	const content = fs.readFileSync(filePath, "utf-8");
 	return JSON.parse(content);
 };

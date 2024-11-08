@@ -83,10 +83,10 @@ export const processTranscriptions = async () => {
 // Función HTTP para ejecutar el procesamiento de transcripciones
 export async function GET(req: Request) {
 	try {
-		// const logMessages = await processTranscriptions();
+		const logMessages = await processTranscriptions();
 		return NextResponse.json({
 			message: "Transcripciones procesadas.",
-			logs: [],
+			logs: logMessages,
 		});
 	} catch (error) {
 		return NextResponse.json(

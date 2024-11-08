@@ -6,6 +6,10 @@ import { embeddings as embeddingsTable } from "../db/schema/embeddings";
 
 export const createResource = async (input: any) => {
 	try {
+    // Convertir el campo sku a string si es necesario
+    if (typeof input.sku !== 'string') {
+      input.sku = String(input.sku);
+  }
 		// Validar y parsear el input usando el esquema
 		const parsedInput = insertResourceSchema.parse(input);
 		const {
@@ -68,9 +72,14 @@ export const createResource = async (input: any) => {
 			}))
 		);
 
+    // Log para verificar la inserción de embeddings
+    console.log("Embeddings insertados para el recurso ID:", resource.id);
+
 		return "Resource successfully created and embedded.";
 	} catch (error) {
-		// Devolver un mensaje de error claro
-		return error instanceof Error ? error.message : "Error, please try again.";
-	}
+    // Log para capturar el error
+    console.error("Error al crear el recurso:", error);
+    // Devolver un mensaje de error claro
+    return error instanceof Error ? error.message : "Error, please try again.";
+}
 };

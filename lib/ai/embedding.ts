@@ -93,6 +93,7 @@ export const findRelevantContent = async (userQuery: string) => {
 		.where(gt(similarity, 0.3))
 		.orderBy((t) => desc(t.similarity))
 		.limit(4);
+		
 
 	// Transformar los resultados para incluir la información relevante
 	return similarProducts.map(
